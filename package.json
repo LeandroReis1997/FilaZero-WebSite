@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Landing page publica do Fila Zero",
   "scripts": {
+    "build": "node tools/build-static.js",
     "start": "node server.js",
     "dev": "node server.js"
   },
