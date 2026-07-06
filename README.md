@@ -31,7 +31,6 @@ Este projeto esta preparado para deploy direto no Railway via Nixpacks.
 ### Observacoes
 
 - O site e estatico, entao nao precisa banco nem variaveis de ambiente para subir.
-- O formulario atual e apenas front-end e nao envia dados para backend ainda.
 
 ## Deploy na Vercel
 
