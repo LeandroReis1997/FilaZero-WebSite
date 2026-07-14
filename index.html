@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260714-4">
 </head>
 <body>
   <div class="noise-layer" aria-hidden="true"></div>
@@ -42,7 +42,7 @@
         <a href="#faq">FAQ</a>
       </nav>
 
-      <a class="btn btn-primary btn-small" href="#planos">Ver planos</a>
+      <button type="button" class="btn btn-primary btn-small" data-open-partner-modal>Começar agora</button>
     </div>
   </header>
 
@@ -58,7 +58,7 @@
         </p>
 
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#como-funciona">Como funciona</a>
+          <button type="button" class="btn btn-primary" data-open-partner-modal>Começar agora</button>
           <a class="btn btn-ghost" href="#painel">Ver o painel</a>
         </div>
 
@@ -209,20 +209,13 @@
       <div class="container">
         <div class="section-header reveal">
           <p class="eyebrow">Planos e assinatura</p>
-          <h2>Comece pequeno e evolua conforme a agenda crescer.</h2>
-          <p class="section-lead">Teste por 30 dias sem cartão no cadastro e escolha entre pagamento mensal, trimestral, semestral ou anual. No anual, pague 11 meses e use 12.</p>
-        </div>
-
-        <div class="pricing-period-toggle reveal" role="tablist" aria-label="Período de cobrança">
-          <button type="button" class="is-active" data-period="monthly">Mensal</button>
-          <button type="button" data-period="quarterly">3 meses</button>
-          <button type="button" data-period="semiannual">6 meses</button>
-          <button type="button" data-period="yearly">Anual</button>
+          <h2>Comece com teste grátis e ative sua operação em poucos minutos.</h2>
+          <p class="section-lead">Comece no teste grátis e depois escolha Solo, Equipe ou Pro no painel — os mesmos planos da assinatura.</p>
         </div>
 
         <div class="pricing-grid reveal" id="pricing-grid"></div>
 
-        <p class="pricing-note reveal">Pagamento antecipado por período. Renovação automática. Cartão, PIX e boleto no painel.</p>
+        <p class="pricing-note reveal">A cobrança online dos planos Solo, Equipe e Pro fica no painel após o trial. No cadastro da landing você só cria a conta e define a senha pelo e-mail.</p>
       </div>
     </section>
 
@@ -335,6 +328,68 @@
     </section>
   </main>
 
+  <div class="partner-modal-backdrop" data-partner-modal hidden>
+    <section class="partner-modal" role="dialog" aria-modal="true" aria-labelledby="partner-modal-title">
+      <div class="partner-modal__top">
+        <button type="button" class="partner-modal__close" data-close-partner-modal aria-label="Fechar cadastro">
+          ×
+        </button>
+      </div>
+
+      <div class="partner-modal__body">
+        <p class="eyebrow">Quero ser parceiro</p>
+        <h2 id="partner-modal-title">Ative seu teste grátis do Fila Zero</h2>
+        <p class="partner-modal__lead">
+          Cadastre seu estabelecimento. Em seguida, você recebe um e-mail para criar a senha e entrar no painel.
+        </p>
+
+        <form class="partner-form" data-partner-form>
+          <label>
+            Nome do estabelecimento
+            <input type="text" name="estabelecimento_nome" maxlength="120" required placeholder="Digite aqui" autocomplete="organization">
+          </label>
+          <label>
+            Nome do responsável
+            <input type="text" name="responsavel_nome" maxlength="100" required placeholder="Digite aqui" autocomplete="name">
+          </label>
+          <label>
+            E-mail de acesso
+            <input type="email" name="email" maxlength="120" required placeholder="Digite aqui" autocomplete="email">
+          </label>
+          <label>
+            Telefone / WhatsApp
+            <input type="tel" name="telefone" maxlength="20" required placeholder="Digite aqui" autocomplete="tel">
+          </label>
+          <label>
+            Tipo do estabelecimento
+            <select name="tipo_id" data-partner-tipo required>
+              <option value="">Selecione</option>
+            </select>
+          </label>
+
+          <div class="partner-form__info">
+            <strong>O que acontece depois?</strong>
+            <span>Criamos sua conta, enviamos um e-mail para você definir a senha e, no primeiro acesso ao painel, o teste grátis de 30 dias começa.</span>
+          </div>
+
+          <div class="partner-form__success" data-partner-success hidden>
+            <strong>Cadastro concluído</strong>
+            <p>
+              Enviamos um e-mail para você criar a senha. Abra a mensagem, defina a senha e entre no painel.
+            </p>
+            <a class="btn btn-primary" data-partner-login-link href="#">Ir para o login</a>
+          </div>
+
+          <p class="partner-form__feedback" data-partner-feedback aria-live="polite"></p>
+
+          <div class="partner-form__actions" data-partner-actions>
+            <button type="submit" class="btn btn-primary" data-partner-submit>Criar acesso agora</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
   <footer class="site-footer">
     <div class="container footer-wrap">
       <div class="footer-brand-block">
@@ -355,6 +410,6 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=20260714-4"></script>
 </body>
 </html>

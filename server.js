@@ -1,7 +1,7 @@
 const http = require('http');
 const handler = require('serve-handler');
 
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT || 8080);
 
 const server = http.createServer((request, response) => {
   return handler(request, response, {
