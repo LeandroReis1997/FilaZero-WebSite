@@ -191,27 +191,112 @@ const SITE_CONFIG = (() => {
   };
 })();
 
+const onlyDigits = (value) => String(value || '').replace(/\D/g, '');
+
+/** Mesma máscara do Novo Estabelecimento / painel admin. */
+const maskTelefone = (value) => {
+  const digits = onlyDigits(value);
+  if (digits.length <= 10) {
+    return digits
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2')
+      .slice(0, 14);
+  }
+  return digits
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .slice(0, 15);
+};
+
 const partnerModal = document.querySelector('[data-partner-modal]');
 const partnerForm = document.querySelector('[data-partner-form]');
 const partnerFeedback = document.querySelector('[data-partner-feedback]');
 const partnerSubmitButton = document.querySelector('[data-partner-submit]');
-const partnerTipoSelect = document.querySelector('[data-partner-tipo]');
+const partnerTipoValue = document.querySelector('[data-partner-tipo-value]');
+const partnerTipoCombo = document.querySelector('[data-partner-tipo-combo]');
+const partnerTipoTrigger = document.querySelector('[data-partner-tipo-trigger]');
+const partnerTipoLabel = document.querySelector('[data-partner-tipo-label]');
+const partnerTipoDropdown = document.querySelector('[data-partner-tipo-dropdown]');
 const partnerSuccess = document.querySelector('[data-partner-success]');
 const partnerActions = document.querySelector('[data-partner-actions]');
 const partnerLoginLink = document.querySelector('[data-partner-login-link]');
+const partnerTelefoneInput = document.querySelector('[data-partner-telefone]');
 const partnerFormFields = partnerForm
-  ? Array.from(partnerForm.querySelectorAll('input, select')).filter((el) => !el.closest('[data-partner-success]'))
+  ? Array.from(partnerForm.querySelectorAll('input:not([type="hidden"]), [data-partner-tipo-combo]')).filter(
+      (el) => !el.closest('[data-partner-success]')
+    )
   : [];
 
 let partnerTiposCarregados = false;
+let partnerTipoOptions = [];
 
-const syncPartnerTipoStyle = () => {
-  if (!partnerTipoSelect) return;
-  partnerTipoSelect.classList.toggle('option-placeholder', !partnerTipoSelect.value);
+partnerTelefoneInput?.addEventListener('input', (event) => {
+  const input = event.target;
+  const masked = maskTelefone(input.value);
+  input.value = masked;
+});
+
+const setPartnerTipoValue = (value, label) => {
+  if (partnerTipoValue) partnerTipoValue.value = value || '';
+  if (!partnerTipoLabel) return;
+
+  if (value) {
+    partnerTipoLabel.textContent = label || value;
+    partnerTipoLabel.classList.remove('placeholder');
+  } else {
+    partnerTipoLabel.textContent = 'Selecione';
+    partnerTipoLabel.classList.add('placeholder');
+  }
+
+  partnerTipoDropdown?.querySelectorAll('.custom-select__option').forEach((option) => {
+    option.classList.toggle('selected', option.dataset.value === String(value));
+  });
 };
 
-partnerTipoSelect?.addEventListener('change', syncPartnerTipoStyle);
-syncPartnerTipoStyle();
+const closePartnerTipoDropdown = () => {
+  if (!partnerTipoDropdown || !partnerTipoTrigger) return;
+  partnerTipoDropdown.hidden = true;
+  partnerTipoTrigger.classList.remove('open');
+  partnerTipoTrigger.setAttribute('aria-expanded', 'false');
+};
+
+const openPartnerTipoDropdown = () => {
+  if (!partnerTipoDropdown || !partnerTipoTrigger || partnerTipoTrigger.disabled) return;
+  partnerTipoDropdown.hidden = false;
+  partnerTipoTrigger.classList.add('open');
+  partnerTipoTrigger.setAttribute('aria-expanded', 'true');
+};
+
+const renderPartnerTipoOptions = (tipos) => {
+  if (!partnerTipoDropdown) return;
+  partnerTipoOptions = tipos;
+  partnerTipoDropdown.innerHTML = '';
+
+  tipos.forEach((tipo) => {
+    const option = document.createElement('div');
+    option.className = 'custom-select__option';
+    option.dataset.value = String(tipo.id);
+    option.setAttribute('role', 'option');
+    option.textContent = tipo.nome;
+    option.addEventListener('click', () => {
+      setPartnerTipoValue(String(tipo.id), tipo.nome);
+      closePartnerTipoDropdown();
+    });
+    partnerTipoDropdown.appendChild(option);
+  });
+};
+
+partnerTipoTrigger?.addEventListener('click', (event) => {
+  event.preventDefault();
+  if (partnerTipoDropdown?.hidden) openPartnerTipoDropdown();
+  else closePartnerTipoDropdown();
+});
+
+document.addEventListener('mousedown', (event) => {
+  if (!partnerTipoCombo?.contains(event.target)) {
+    closePartnerTipoDropdown();
+  }
+});
 
 const setPartnerFeedback = (message, type = '') => {
   if (!partnerFeedback) return;
@@ -223,20 +308,28 @@ const setPartnerLoading = (loading) => {
   if (!partnerSubmitButton) return;
   partnerSubmitButton.disabled = loading;
   partnerSubmitButton.textContent = loading ? 'Criando acesso...' : 'Criar acesso agora';
+  if (partnerTipoTrigger) partnerTipoTrigger.disabled = loading;
 };
 
 const resetPartnerFormView = () => {
   if (partnerSuccess) partnerSuccess.hidden = true;
   if (partnerActions) partnerActions.hidden = false;
   partnerFormFields.forEach((field) => {
+    if (field.matches('[data-partner-tipo-combo]')) {
+      if (partnerTipoTrigger) partnerTipoTrigger.disabled = false;
+      return;
+    }
     field.disabled = false;
     const wrap = field.closest('label');
     if (wrap) wrap.hidden = false;
   });
+  const tipoLabel = partnerTipoCombo?.closest('label');
+  if (tipoLabel) tipoLabel.hidden = false;
   const info = partnerForm?.querySelector('.partner-form__info');
   if (info) info.hidden = false;
   setPartnerFeedback('');
-  syncPartnerTipoStyle();
+  setPartnerTipoValue('', '');
+  closePartnerTipoDropdown();
 };
 
 const showPartnerSuccess = (loginUrl) => {
@@ -252,10 +345,11 @@ const showPartnerSuccess = (loginUrl) => {
     partnerLoginLink.href = loginUrl || `${SITE_CONFIG.adminPanelUrl}/login`;
   }
   setPartnerFeedback('');
+  closePartnerTipoDropdown();
 };
 
 const loadPartnerTipos = async () => {
-  if (!partnerTipoSelect || partnerTiposCarregados) return;
+  if (!partnerTipoCombo || partnerTiposCarregados) return;
 
   if (window.location.protocol === 'file:') {
     setPartnerFeedback(
@@ -277,15 +371,8 @@ const loadPartnerTipos = async () => {
       throw new Error('Nenhum tipo de estabelecimento cadastrado na API.');
     }
 
-    partnerTipoSelect.innerHTML = '<option value="">Selecione</option>';
-    tipos.forEach((tipo) => {
-      const option = document.createElement('option');
-      option.value = String(tipo.id);
-      option.textContent = tipo.nome;
-      partnerTipoSelect.appendChild(option);
-    });
+    renderPartnerTipoOptions(tipos);
     partnerTiposCarregados = true;
-    syncPartnerTipoStyle();
     setPartnerFeedback('');
   } catch (error) {
     const offline =
@@ -312,6 +399,7 @@ const closePartnerModal = () => {
   if (!partnerModal) return;
   partnerModal.hidden = true;
   document.body.classList.remove('modal-open');
+  closePartnerTipoDropdown();
 };
 
 document.querySelectorAll('[data-open-partner-modal]').forEach((button) => {
@@ -345,16 +433,30 @@ document.querySelectorAll('[data-open-whatsapp]').forEach((link) => {
 partnerForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   setPartnerFeedback('');
-  setPartnerLoading(true);
 
   const formData = new FormData(partnerForm);
+  const tipoId = Number(formData.get('tipo_id') || partnerTipoValue?.value || 0);
   const payload = {
     estabelecimento_nome: String(formData.get('estabelecimento_nome') || '').trim(),
     responsavel_nome: String(formData.get('responsavel_nome') || '').trim(),
     email: String(formData.get('email') || '').trim(),
-    telefone: String(formData.get('telefone') || '').trim(),
-    tipo_id: Number(formData.get('tipo_id')),
+    telefone: onlyDigits(formData.get('telefone') || ''),
+    tipo_id: tipoId,
   };
+
+  if (payload.telefone.length < 10) {
+    setPartnerFeedback('Informe um telefone válido com DDD.', 'error');
+    partnerTelefoneInput?.focus();
+    return;
+  }
+
+  if (!payload.tipo_id) {
+    setPartnerFeedback('Selecione o tipo do estabelecimento.', 'error');
+    openPartnerTipoDropdown();
+    return;
+  }
+
+  setPartnerLoading(true);
 
   try {
     const response = await fetch(`${SITE_CONFIG.adminApiBaseUrl}/auth/parceiros/cadastro`, {
@@ -373,6 +475,7 @@ partnerForm?.addEventListener('submit', async (event) => {
 
     showPartnerSuccess(data?.login_url || `${SITE_CONFIG.adminPanelUrl}/login`);
     partnerForm.reset();
+    setPartnerTipoValue('', '');
   } catch (error) {
     setPartnerFeedback(error.message || 'Não foi possível concluir seu cadastro.', 'error');
   } finally {
