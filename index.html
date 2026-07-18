@@ -10,12 +10,19 @@
   <meta property="og:description" content="Menos fila, mais controle e uma operação de atendimento mais previsível.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.filazerobrasil.com.br/">
-  <meta property="og:image" content="https://static.filazerobrasil.com.br/LandingPage/admin-dashboard.png">
+  <meta property="og:site_name" content="Fila Zero">
+  <meta property="og:image" content="https://static.filazerobrasil.com.br/painel/logo-filazero-orange.png">
+  <meta property="og:image:secure_url" content="https://static.filazerobrasil.com.br/painel/logo-filazero-orange.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="840">
+  <meta property="og:image:height" content="560">
+  <meta property="og:image:alt" content="Logo Fila Zero">
   <meta property="og:locale" content="pt_BR">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Fila Zero | Agenda inteligente">
   <meta name="twitter:description" content="Agenda online, app para clientes e painel administrativo sincronizados.">
-  <meta name="twitter:image" content="https://static.filazerobrasil.com.br/LandingPage/admin-dashboard.png">
+  <meta name="twitter:image" content="https://static.filazerobrasil.com.br/painel/logo-filazero-orange.png">
+  <meta name="twitter:image:alt" content="Logo Fila Zero">
   <title>Fila Zero | Agenda inteligente para estabelecimentos</title>
   <link rel="icon" type="image/png" href="assets/brand/icon-filazero.png">
   <link rel="apple-touch-icon" href="assets/brand/icon-filazero.png">
@@ -23,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260714-6">
+  <link rel="stylesheet" href="styles.css?v=20260717-2">
 </head>
 <body>
   <div class="noise-layer" aria-hidden="true"></div>
@@ -306,7 +313,7 @@
         </article>
         <article class="faq-item reveal">
           <h3>Como funciona o trial?</h3>
-          <p>São 30 dias de acesso completo, sem cartão no cadastro. Antes do fim do período, escolha um plano pago no painel.</p>
+          <p>São 30 dias grátis, com o mesmo limite do Solo (1 profissional), sem cartão no cadastro. Antes do fim do período, escolha um plano pago no painel.</p>
         </article>
         <article class="faq-item reveal">
           <h3>Quais formas de pagamento existem?</h3>
@@ -361,7 +368,21 @@
             <input type="tel" name="telefone" data-partner-telefone maxlength="15" required placeholder="(11) 99999-9999" autocomplete="tel" inputmode="numeric">
           </label>
           <label>
-            Tipo do estabelecimento
+            CPF ou CNPJ de cobrança
+            <input
+              type="text"
+              name="documento_faturamento"
+              data-partner-documento
+              maxlength="18"
+              required
+              placeholder="000.000.000-00 ou 00.000.000/0000-00"
+              inputmode="numeric"
+              autocomplete="off"
+            >
+            <small class="partner-form__hint">Usado apenas para gerar cobranças da assinatura (PIX/cartão).</small>
+          </label>
+          <div class="partner-form__field">
+            <span class="partner-form__label">Tipo do estabelecimento</span>
             <input type="hidden" name="tipo_id" data-partner-tipo-value value="">
             <div class="custom-select" data-partner-tipo-combo>
               <button type="button" class="custom-select__trigger" data-partner-tipo-trigger aria-haspopup="listbox" aria-expanded="false">
@@ -372,7 +393,7 @@
               </button>
               <div class="custom-select__dropdown" data-partner-tipo-dropdown hidden role="listbox"></div>
             </div>
-          </label>
+          </div>
 
           <div class="partner-form__info">
             <strong>O que acontece depois?</strong>
@@ -417,6 +438,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20260714-6"></script>
+  <script src="script.js?v=20260717-3"></script>
 </body>
 </html>

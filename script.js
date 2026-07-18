@@ -91,7 +91,7 @@ const PRICING_PLANOS = [
     destaque: 'Começa no primeiro login',
     features: [
       '30 dias grátis',
-      'Acesso completo sem limites',
+      '1 profissional (mesmo limite do Solo)',
       'Sem cartão no cadastro',
       'Senha definida por e-mail após o cadastro',
     ],
@@ -208,6 +208,21 @@ const maskTelefone = (value) => {
     .slice(0, 15);
 };
 
+const maskCpfCnpj = (value) => {
+  const digits = onlyDigits(value).slice(0, 14);
+  if (digits.length <= 11) {
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+  return digits
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+};
+
 const partnerModal = document.querySelector('[data-partner-modal]');
 const partnerForm = document.querySelector('[data-partner-form]');
 const partnerFeedback = document.querySelector('[data-partner-feedback]');
@@ -221,6 +236,7 @@ const partnerSuccess = document.querySelector('[data-partner-success]');
 const partnerActions = document.querySelector('[data-partner-actions]');
 const partnerLoginLink = document.querySelector('[data-partner-login-link]');
 const partnerTelefoneInput = document.querySelector('[data-partner-telefone]');
+const partnerDocumentoInput = document.querySelector('[data-partner-documento]');
 const partnerFormFields = partnerForm
   ? Array.from(partnerForm.querySelectorAll('input:not([type="hidden"]), [data-partner-tipo-combo]')).filter(
       (el) => !el.closest('[data-partner-success]')
@@ -234,6 +250,24 @@ partnerTelefoneInput?.addEventListener('input', (event) => {
   const input = event.target;
   const masked = maskTelefone(input.value);
   input.value = masked;
+});
+
+const applyDocumentoMask = (input) => {
+  if (!input) return;
+  input.value = maskCpfCnpj(input.value);
+};
+
+partnerDocumentoInput?.addEventListener('input', (event) => {
+  applyDocumentoMask(event.target);
+});
+
+// Fallback: se o input for recriado ou o cache atrasar o bind, mascara via delegação.
+partnerForm?.addEventListener('input', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement)) return;
+  if (target.matches('[data-partner-documento], [name="documento_faturamento"]')) {
+    applyDocumentoMask(target);
+  }
 });
 
 const setPartnerTipoValue = (value, label) => {
@@ -278,7 +312,14 @@ const renderPartnerTipoOptions = (tipos) => {
     option.dataset.value = String(tipo.id);
     option.setAttribute('role', 'option');
     option.textContent = tipo.nome;
-    option.addEventListener('click', () => {
+    option.addEventListener('mousedown', (event) => {
+      // Evita que o clique “vaze” e reabra o combo.
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    option.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       setPartnerTipoValue(String(tipo.id), tipo.nome);
       closePartnerTipoDropdown();
     });
@@ -288,6 +329,7 @@ const renderPartnerTipoOptions = (tipos) => {
 
 partnerTipoTrigger?.addEventListener('click', (event) => {
   event.preventDefault();
+  event.stopPropagation();
   if (partnerTipoDropdown?.hidden) openPartnerTipoDropdown();
   else closePartnerTipoDropdown();
 });
@@ -296,6 +338,10 @@ document.addEventListener('mousedown', (event) => {
   if (!partnerTipoCombo?.contains(event.target)) {
     closePartnerTipoDropdown();
   }
+});
+
+partnerTipoDropdown?.addEventListener('mousedown', (event) => {
+  event.stopPropagation();
 });
 
 const setPartnerFeedback = (message, type = '') => {
@@ -311,6 +357,8 @@ const setPartnerLoading = (loading) => {
   if (partnerTipoTrigger) partnerTipoTrigger.disabled = loading;
 };
 
+const partnerFieldWrap = (el) => el?.closest('label, .partner-form__field') || null;
+
 const resetPartnerFormView = () => {
   if (partnerSuccess) partnerSuccess.hidden = true;
   if (partnerActions) partnerActions.hidden = false;
@@ -320,11 +368,11 @@ const resetPartnerFormView = () => {
       return;
     }
     field.disabled = false;
-    const wrap = field.closest('label');
+    const wrap = partnerFieldWrap(field);
     if (wrap) wrap.hidden = false;
   });
-  const tipoLabel = partnerTipoCombo?.closest('label');
-  if (tipoLabel) tipoLabel.hidden = false;
+  const tipoWrap = partnerFieldWrap(partnerTipoCombo);
+  if (tipoWrap) tipoWrap.hidden = false;
   const info = partnerForm?.querySelector('.partner-form__info');
   if (info) info.hidden = false;
   setPartnerFeedback('');
@@ -334,9 +382,11 @@ const resetPartnerFormView = () => {
 
 const showPartnerSuccess = (loginUrl) => {
   partnerFormFields.forEach((field) => {
-    const wrap = field.closest('label');
+    const wrap = partnerFieldWrap(field);
     if (wrap) wrap.hidden = true;
   });
+  const tipoWrap = partnerFieldWrap(partnerTipoCombo);
+  if (tipoWrap) tipoWrap.hidden = true;
   const info = partnerForm?.querySelector('.partner-form__info');
   if (info) info.hidden = true;
   if (partnerActions) partnerActions.hidden = true;
@@ -387,11 +437,20 @@ const loadPartnerTipos = async () => {
   }
 };
 
+const clearPartnerForm = () => {
+  partnerForm?.reset();
+  setPartnerTipoValue('', '');
+  setPartnerFeedback('');
+  setPartnerLoading(false);
+  resetPartnerFormView();
+  closePartnerTipoDropdown();
+};
+
 const openPartnerModal = () => {
   if (!partnerModal) return;
   partnerModal.hidden = false;
   document.body.classList.add('modal-open');
-  resetPartnerFormView();
+  clearPartnerForm();
   loadPartnerTipos();
 };
 
@@ -399,7 +458,7 @@ const closePartnerModal = () => {
   if (!partnerModal) return;
   partnerModal.hidden = true;
   document.body.classList.remove('modal-open');
-  closePartnerTipoDropdown();
+  clearPartnerForm();
 };
 
 document.querySelectorAll('[data-open-partner-modal]').forEach((button) => {
@@ -441,12 +500,19 @@ partnerForm?.addEventListener('submit', async (event) => {
     responsavel_nome: String(formData.get('responsavel_nome') || '').trim(),
     email: String(formData.get('email') || '').trim(),
     telefone: onlyDigits(formData.get('telefone') || ''),
+    documento_faturamento: onlyDigits(formData.get('documento_faturamento') || ''),
     tipo_id: tipoId,
   };
 
   if (payload.telefone.length < 10) {
     setPartnerFeedback('Informe um telefone válido com DDD.', 'error');
     partnerTelefoneInput?.focus();
+    return;
+  }
+
+  if (payload.documento_faturamento.length !== 11 && payload.documento_faturamento.length !== 14) {
+    setPartnerFeedback('Informe um CPF ou CNPJ de cobrança válido.', 'error');
+    partnerDocumentoInput?.focus();
     return;
   }
 

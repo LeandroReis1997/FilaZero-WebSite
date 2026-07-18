@@ -984,11 +984,16 @@ p {
   gap: 1rem;
 }
 
-.partner-form label {
+.partner-form label,
+.partner-form__field {
   display: grid;
   gap: 0.35rem;
   font-weight: 700;
   color: var(--ink);
+}
+
+.partner-form__label {
+  display: block;
 }
 
 .partner-form input,
@@ -1143,6 +1148,15 @@ p {
 
 .partner-form__info strong {
   color: var(--ink);
+}
+
+.partner-form__hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+  line-height: 1.35;
 }
 
 .partner-form__success {
