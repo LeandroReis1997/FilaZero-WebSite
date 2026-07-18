@@ -223,6 +223,8 @@ const maskCpfCnpj = (value) => {
     .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
 };
 
+const maskCep = (value) => onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2');
+
 const partnerModal = document.querySelector('[data-partner-modal]');
 const partnerForm = document.querySelector('[data-partner-form]');
 const partnerFeedback = document.querySelector('[data-partner-feedback]');
@@ -237,11 +239,101 @@ const partnerActions = document.querySelector('[data-partner-actions]');
 const partnerLoginLink = document.querySelector('[data-partner-login-link]');
 const partnerTelefoneInput = document.querySelector('[data-partner-telefone]');
 const partnerDocumentoInput = document.querySelector('[data-partner-documento]');
+const partnerCepInput = document.querySelector('[data-partner-cep]');
+const partnerEnderecoInput = document.querySelector('[data-partner-endereco]');
+const partnerCidadeInput = document.querySelector('[data-partner-cidade]');
+const partnerEstadoValue = document.querySelector('[data-partner-estado-value]');
+const partnerEstadoCombo = document.querySelector('[data-partner-estado-combo]');
+const partnerEstadoTrigger = document.querySelector('[data-partner-estado-trigger]');
+const partnerEstadoLabel = document.querySelector('[data-partner-estado-label]');
+const partnerEstadoDropdown = document.querySelector('[data-partner-estado-dropdown]');
 const partnerFormFields = partnerForm
-  ? Array.from(partnerForm.querySelectorAll('input:not([type="hidden"]), [data-partner-tipo-combo]')).filter(
-      (el) => !el.closest('[data-partner-success]')
-    )
+  ? Array.from(
+      partnerForm.querySelectorAll(
+        'input:not([type="hidden"]), select, [data-partner-tipo-combo], [data-partner-estado-combo]'
+      )
+    ).filter((el) => !el.closest('[data-partner-success]'))
   : [];
+
+const PARTNER_ESTADOS = [
+  ['AC', 'Acre'], ['AL', 'Alagoas'], ['AP', 'Amapá'], ['AM', 'Amazonas'],
+  ['BA', 'Bahia'], ['CE', 'Ceará'], ['DF', 'Distrito Federal'],
+  ['ES', 'Espírito Santo'], ['GO', 'Goiás'], ['MA', 'Maranhão'],
+  ['MT', 'Mato Grosso'], ['MS', 'Mato Grosso do Sul'], ['MG', 'Minas Gerais'],
+  ['PA', 'Pará'], ['PB', 'Paraíba'], ['PR', 'Paraná'], ['PE', 'Pernambuco'],
+  ['PI', 'Piauí'], ['RJ', 'Rio de Janeiro'], ['RN', 'Rio Grande do Norte'],
+  ['RS', 'Rio Grande do Sul'], ['RO', 'Rondônia'], ['RR', 'Roraima'],
+  ['SC', 'Santa Catarina'], ['SP', 'São Paulo'], ['SE', 'Sergipe'],
+  ['TO', 'Tocantins'],
+];
+
+const setPartnerEstadoValue = (value, label) => {
+  if (partnerEstadoValue) partnerEstadoValue.value = value || '';
+  if (!partnerEstadoLabel) return;
+
+  if (value) {
+    partnerEstadoLabel.textContent = label || value;
+    partnerEstadoLabel.classList.remove('placeholder');
+  } else {
+    partnerEstadoLabel.textContent = 'Selecione';
+    partnerEstadoLabel.classList.add('placeholder');
+  }
+
+  partnerEstadoDropdown?.querySelectorAll('.custom-select__option').forEach((option) => {
+    option.classList.toggle('selected', option.dataset.value === String(value));
+  });
+};
+
+const closePartnerEstadoDropdown = () => {
+  if (!partnerEstadoDropdown || !partnerEstadoTrigger) return;
+  partnerEstadoDropdown.hidden = true;
+  partnerEstadoTrigger.classList.remove('open');
+  partnerEstadoTrigger.setAttribute('aria-expanded', 'false');
+};
+
+const openPartnerEstadoDropdown = () => {
+  if (!partnerEstadoDropdown || !partnerEstadoTrigger || partnerEstadoTrigger.disabled) return;
+  partnerEstadoDropdown.hidden = false;
+  partnerEstadoTrigger.classList.add('open');
+  partnerEstadoTrigger.setAttribute('aria-expanded', 'true');
+};
+
+const renderPartnerEstadoOptions = () => {
+  if (!partnerEstadoDropdown) return;
+  partnerEstadoDropdown.innerHTML = '';
+
+  PARTNER_ESTADOS.forEach(([uf, nome]) => {
+    const option = document.createElement('div');
+    option.className = 'custom-select__option';
+    option.dataset.value = uf;
+    option.setAttribute('role', 'option');
+    option.textContent = `${uf} — ${nome}`;
+    option.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    option.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setPartnerEstadoValue(uf, `${uf} — ${nome}`);
+      closePartnerEstadoDropdown();
+    });
+    partnerEstadoDropdown.appendChild(option);
+  });
+};
+
+partnerEstadoTrigger?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (partnerEstadoDropdown?.hidden) {
+    closePartnerTipoDropdown();
+    openPartnerEstadoDropdown();
+  } else {
+    closePartnerEstadoDropdown();
+  }
+});
+
+renderPartnerEstadoOptions();
 
 let partnerTiposCarregados = false;
 let partnerTipoOptions = [];
@@ -261,12 +353,50 @@ partnerDocumentoInput?.addEventListener('input', (event) => {
   applyDocumentoMask(event.target);
 });
 
+const buscarEnderecoPorCep = async (cepDigits) => {
+  if (!cepDigits || cepDigits.length !== 8) return null;
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (data?.erro) return null;
+    return data;
+  } catch (_) {
+    return null;
+  }
+};
+
+partnerCepInput?.addEventListener('input', (event) => {
+  event.target.value = maskCep(event.target.value);
+});
+
+partnerCepInput?.addEventListener('blur', async () => {
+  const cepDigits = onlyDigits(partnerCepInput.value || '');
+  if (cepDigits.length !== 8) return;
+  const endereco = await buscarEnderecoPorCep(cepDigits);
+  if (!endereco) return;
+  if (partnerEnderecoInput && !String(partnerEnderecoInput.value || '').trim()) {
+    partnerEnderecoInput.value = endereco.logradouro || '';
+  } else if (partnerEnderecoInput && endereco.logradouro) {
+    partnerEnderecoInput.value = endereco.logradouro;
+  }
+  if (partnerCidadeInput) partnerCidadeInput.value = endereco.localidade || partnerCidadeInput.value;
+  if (endereco.uf) {
+    const uf = String(endereco.uf).toUpperCase();
+    const match = PARTNER_ESTADOS.find(([code]) => code === uf);
+    setPartnerEstadoValue(uf, match ? `${uf} — ${match[1]}` : uf);
+  }
+});
+
 // Fallback: se o input for recriado ou o cache atrasar o bind, mascara via delegação.
 partnerForm?.addEventListener('input', (event) => {
   const target = event.target;
   if (!(target instanceof HTMLInputElement)) return;
   if (target.matches('[data-partner-documento], [name="documento_faturamento"]')) {
     applyDocumentoMask(target);
+  }
+  if (target.matches('[data-partner-cep], [name="cep"]')) {
+    target.value = maskCep(target.value);
   }
 });
 
@@ -330,13 +460,18 @@ const renderPartnerTipoOptions = (tipos) => {
 partnerTipoTrigger?.addEventListener('click', (event) => {
   event.preventDefault();
   event.stopPropagation();
-  if (partnerTipoDropdown?.hidden) openPartnerTipoDropdown();
-  else closePartnerTipoDropdown();
+  if (partnerTipoDropdown?.hidden) {
+    closePartnerEstadoDropdown();
+    openPartnerTipoDropdown();
+  } else closePartnerTipoDropdown();
 });
 
 document.addEventListener('mousedown', (event) => {
   if (!partnerTipoCombo?.contains(event.target)) {
     closePartnerTipoDropdown();
+  }
+  if (!partnerEstadoCombo?.contains(event.target)) {
+    closePartnerEstadoDropdown();
   }
 });
 
@@ -355,6 +490,7 @@ const setPartnerLoading = (loading) => {
   partnerSubmitButton.disabled = loading;
   partnerSubmitButton.textContent = loading ? 'Criando acesso...' : 'Criar acesso agora';
   if (partnerTipoTrigger) partnerTipoTrigger.disabled = loading;
+  if (partnerEstadoTrigger) partnerEstadoTrigger.disabled = loading;
 };
 
 const partnerFieldWrap = (el) => el?.closest('label, .partner-form__field') || null;
@@ -367,17 +503,25 @@ const resetPartnerFormView = () => {
       if (partnerTipoTrigger) partnerTipoTrigger.disabled = false;
       return;
     }
+    if (field.matches('[data-partner-estado-combo]')) {
+      if (partnerEstadoTrigger) partnerEstadoTrigger.disabled = false;
+      return;
+    }
     field.disabled = false;
     const wrap = partnerFieldWrap(field);
     if (wrap) wrap.hidden = false;
   });
   const tipoWrap = partnerFieldWrap(partnerTipoCombo);
   if (tipoWrap) tipoWrap.hidden = false;
+  const estadoWrap = partnerFieldWrap(partnerEstadoCombo);
+  if (estadoWrap) estadoWrap.hidden = false;
   const info = partnerForm?.querySelector('.partner-form__info');
   if (info) info.hidden = false;
   setPartnerFeedback('');
   setPartnerTipoValue('', '');
+  setPartnerEstadoValue('', '');
   closePartnerTipoDropdown();
+  closePartnerEstadoDropdown();
 };
 
 const showPartnerSuccess = (loginUrl) => {
@@ -387,6 +531,8 @@ const showPartnerSuccess = (loginUrl) => {
   });
   const tipoWrap = partnerFieldWrap(partnerTipoCombo);
   if (tipoWrap) tipoWrap.hidden = true;
+  const estadoWrap = partnerFieldWrap(partnerEstadoCombo);
+  if (estadoWrap) estadoWrap.hidden = true;
   const info = partnerForm?.querySelector('.partner-form__info');
   if (info) info.hidden = true;
   if (partnerActions) partnerActions.hidden = true;
@@ -396,6 +542,7 @@ const showPartnerSuccess = (loginUrl) => {
   }
   setPartnerFeedback('');
   closePartnerTipoDropdown();
+  closePartnerEstadoDropdown();
 };
 
 const loadPartnerTipos = async () => {
@@ -440,10 +587,12 @@ const loadPartnerTipos = async () => {
 const clearPartnerForm = () => {
   partnerForm?.reset();
   setPartnerTipoValue('', '');
+  setPartnerEstadoValue('', '');
   setPartnerFeedback('');
   setPartnerLoading(false);
   resetPartnerFormView();
   closePartnerTipoDropdown();
+  closePartnerEstadoDropdown();
 };
 
 const openPartnerModal = () => {
@@ -502,6 +651,11 @@ partnerForm?.addEventListener('submit', async (event) => {
     telefone: onlyDigits(formData.get('telefone') || ''),
     documento_faturamento: onlyDigits(formData.get('documento_faturamento') || ''),
     tipo_id: tipoId,
+    cep: onlyDigits(formData.get('cep') || ''),
+    endereco: String(formData.get('endereco') || '').trim(),
+    numero: String(formData.get('numero') || '').trim(),
+    cidade: String(formData.get('cidade') || '').trim(),
+    estado: String(formData.get('estado') || partnerEstadoValue?.value || '').trim().toUpperCase(),
   };
 
   if (payload.telefone.length < 10) {
@@ -519,6 +673,18 @@ partnerForm?.addEventListener('submit', async (event) => {
   if (!payload.tipo_id) {
     setPartnerFeedback('Selecione o tipo do estabelecimento.', 'error');
     openPartnerTipoDropdown();
+    return;
+  }
+
+  if (payload.cep && payload.cep.length !== 8) {
+    setPartnerFeedback('Informe um CEP válido ou deixe em branco.', 'error');
+    partnerCepInput?.focus();
+    return;
+  }
+
+  if (payload.estado && payload.estado.length !== 2) {
+    setPartnerFeedback('Selecione um estado válido ou deixe em branco.', 'error');
+    openPartnerEstadoDropdown();
     return;
   }
 
@@ -542,6 +708,7 @@ partnerForm?.addEventListener('submit', async (event) => {
     showPartnerSuccess(data?.login_url || `${SITE_CONFIG.adminPanelUrl}/login`);
     partnerForm.reset();
     setPartnerTipoValue('', '');
+    setPartnerEstadoValue('', '');
   } catch (error) {
     setPartnerFeedback(error.message || 'Não foi possível concluir seu cadastro.', 'error');
   } finally {

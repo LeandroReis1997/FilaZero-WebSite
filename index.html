@@ -395,6 +395,41 @@
             </div>
           </div>
 
+          <div class="partner-form__section-title">Endereço do estabelecimento</div>
+          <div class="partner-form__row">
+            <label>
+              CEP
+              <input type="text" name="cep" data-partner-cep maxlength="9" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code">
+            </label>
+            <label>
+              Número
+              <input type="text" name="numero" maxlength="20" placeholder="Número" autocomplete="address-line2">
+            </label>
+          </div>
+          <label>
+            Rua / logradouro
+            <input type="text" name="endereco" data-partner-endereco maxlength="255" placeholder="Rua / avenida" autocomplete="address-line1">
+          </label>
+          <div class="partner-form__row">
+            <label>
+              Cidade
+              <input type="text" name="cidade" data-partner-cidade maxlength="100" placeholder="Cidade" autocomplete="address-level2">
+            </label>
+            <div class="partner-form__field">
+              <span class="partner-form__label">Estado</span>
+              <input type="hidden" name="estado" data-partner-estado-value value="">
+              <div class="custom-select" data-partner-estado-combo>
+                <button type="button" class="custom-select__trigger" data-partner-estado-trigger aria-haspopup="listbox" aria-expanded="false">
+                  <span class="placeholder" data-partner-estado-label>Selecione</span>
+                  <svg class="custom-select__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="custom-select__dropdown" data-partner-estado-dropdown hidden role="listbox"></div>
+              </div>
+            </div>
+          </div>
+
           <div class="partner-form__info">
             <strong>O que acontece depois?</strong>
             <span>Criamos sua conta, enviamos um e-mail para você definir a senha e, no primeiro acesso ao painel, o teste grátis de 30 dias começa.</span>
@@ -438,6 +473,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20260717-3"></script>
+  <script src="script.js?v=20260718-3"></script>
 </body>
 </html>
