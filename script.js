@@ -181,12 +181,14 @@ initPricing();
 
 const SITE_CONFIG = (() => {
   const custom = window.FILA_ZERO_SITE_CONFIG || {};
-  const host = window.location.hostname;
-  const isLocal = host === 'localhost' || host === '127.0.0.1';
+  // Local (descomente para apontar ao backend/painel da máquina):
+  // const isLocal = host === 'localhost' || host === '127.0.0.1';
+  // adminApiBaseUrl: 'http://localhost:4000/api/admin'
+  // adminPanelUrl: 'http://localhost:3000'
 
   return {
-    adminApiBaseUrl: custom.adminApiBaseUrl || (isLocal ? 'http://localhost:4000/api/admin' : 'https://painel.filazerobrasil.com.br/api/admin'),
-    adminPanelUrl: custom.adminPanelUrl || (isLocal ? 'http://localhost:3000' : 'https://painel.filazerobrasil.com.br'),
+    adminApiBaseUrl: custom.adminApiBaseUrl || 'https://api.filazerobrasil.com.br/api/admin',
+    adminPanelUrl: custom.adminPanelUrl || 'https://painel.filazerobrasil.com.br',
     whatsappUrl: custom.whatsappUrl || 'https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20conhecer%20o%20Fila%20Zero',
   };
 })();
@@ -577,7 +579,7 @@ const loadPartnerTipos = async () => {
       /failed to fetch|networkerror|load failed/i.test(String(error?.message || ''));
     setPartnerFeedback(
       offline
-        ? 'Não foi possível falar com a API. Confirme se o backend está em http://localhost:4000.'
+        ? 'Não foi possível falar com a API. Confirme se a API de produção está no ar (api.filazerobrasil.com.br).'
         : (error.message || 'Não foi possível carregar os tipos de estabelecimento.'),
       'error'
     );
