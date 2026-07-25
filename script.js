@@ -579,7 +579,7 @@ const loadPartnerTipos = async () => {
       /failed to fetch|networkerror|load failed/i.test(String(error?.message || ''));
     setPartnerFeedback(
       offline
-        ? 'Não foi possível falar com a API. Confirme se a API de produção está no ar (api.filazerobrasil.com.br).'
+        ? 'Não foi possível falar com a API. Confirme se a API de produção está no ar.'
         : (error.message || 'Não foi possível carregar os tipos de estabelecimento.'),
       'error'
     );
