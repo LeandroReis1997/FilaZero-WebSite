@@ -181,14 +181,12 @@ initPricing();
 
 const SITE_CONFIG = (() => {
   const custom = window.FILA_ZERO_SITE_CONFIG || {};
-  const host = window.location.hostname;
-  const isLocal = host === 'localhost' || host === '127.0.0.1';
+  // Local (descomente para apontar ao backend da máquina):
+  // adminApiBaseUrl: custom.adminApiBaseUrl || 'http://localhost:4000/api/admin',
 
   return {
-    // Produção (descomente quando for publicar de novo):
-    // adminApiBaseUrl: custom.adminApiBaseUrl || 'https://api.filazerobrasil.com.br/api/admin',
-    adminApiBaseUrl: custom.adminApiBaseUrl || 'http://localhost:4000/api/admin',
-    adminPanelUrl: custom.adminPanelUrl || (isLocal ? 'http://localhost:3000' : 'https://painel.filazerobrasil.com.br'),
+    adminApiBaseUrl: custom.adminApiBaseUrl || 'https://api.filazerobrasil.com.br/api/admin',
+    adminPanelUrl: custom.adminPanelUrl || 'https://painel.filazerobrasil.com.br',
     whatsappUrl: custom.whatsappUrl || 'https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20conhecer%20o%20Fila%20Zero',
   };
 })();
