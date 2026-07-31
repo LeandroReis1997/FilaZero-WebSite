@@ -108,7 +108,7 @@ const PRICING_PLANOS = [
       'Painel completo',
       'App para clientes',
     ],
-    cta: 'Quero ser parceiro',
+    cta: 'Quero ser cliente',
   },
   {
     id: 'equipe',
@@ -123,7 +123,7 @@ const PRICING_PLANOS = [
       'Painel completo',
       'App para clientes',
     ],
-    cta: 'Quero ser parceiro',
+    cta: 'Quero ser cliente',
   },
   {
     id: 'pro',
@@ -136,7 +136,7 @@ const PRICING_PLANOS = [
       'Painel completo',
       'App para clientes',
     ],
-    cta: 'Quero ser parceiro',
+    cta: 'Quero ser cliente',
   },
 ];
 
