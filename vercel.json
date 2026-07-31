@@ -22,6 +22,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "privacidade.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "assets/**/*",
       "use": "@vercel/static"
     }
