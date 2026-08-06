@@ -26,6 +26,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "exclusao-de-conta.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "assets/**/*",
       "use": "@vercel/static"
     }
