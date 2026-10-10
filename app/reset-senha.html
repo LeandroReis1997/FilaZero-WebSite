@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redefinir senha | Fila Zero</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="../assets/brand/icon-filazero.png" />
+  <style>
+    :root {
+      --orange: #ff6f00;
+      --bg: #f6f7fb;
+      --ink: #1f2937;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Manrope, Segoe UI, sans-serif;
+      background: linear-gradient(160deg, #fff7ed 0%, var(--bg) 45%, #eef2ff 100%);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: min(440px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+    }
+    p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 12px;
+      border: 0;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    .hint {
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+    .error {
+      color: #b91c1c;
+      background: #fef2f2;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Redefinir senha</h1>
+    <p id="message">Abrindo o aplicativo Fila Zero para você continuar...</p>
+    <div id="error" class="error" hidden></div>
+    <a id="openApp" class="btn" href="#">Abrir no app Fila Zero</a>
+    <p class="hint">Se o app não abrir automaticamente, toque no botão acima. É preciso ter o Fila Zero instalado neste aparelho.</p>
+  </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var token = (params.get('token') || '').trim();
+      var openApp = document.getElementById('openApp');
+      var message = document.getElementById('message');
+      var error = document.getElementById('error');
+
+      if (!token) {
+        message.textContent = 'Este link está incompleto.';
+        error.hidden = false;
+        error.textContent = 'Token ausente. Solicite uma nova recuperação de senha no app.';
+        openApp.style.display = 'none';
+        return;
+      }
+
+      var deepLink = 'filazero://reset-senha?token=' + encodeURIComponent(token);
+      var intentLink = 'intent://reset-senha?token=' + encodeURIComponent(token) +
+        '#Intent;scheme=filazero;package=br.com.filazerobrasil.app;end';
+      var isAndroid = /Android/i.test(navigator.userAgent || '');
+      var primary = isAndroid ? intentLink : deepLink;
+      openApp.setAttribute('href', primary);
+
+      // Tenta abrir o app automaticamente (intent:// no Android).
+      window.location.href = primary;
+    })();
+  </script>
+</body>
+</html>

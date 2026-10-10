@@ -144,7 +144,7 @@ const initPricing = () => {
   const grid = document.getElementById('pricing-grid');
   if (!grid) return;
 
-  grid.innerHTML = PRICING_PLANOS.map((plano) => {
+    grid.innerHTML = PRICING_PLANOS.map((plano) => {
     const classes = [
       'pricing-card',
       plano.featured ? 'pricing-card--featured' : '',
@@ -162,20 +162,20 @@ const initPricing = () => {
       ? `<span class="pricing-badge">${plano.badge}</span>`
       : '';
 
-    return `
-      <article class="${classes}">
+      return `
+        <article class="${classes}">
         ${badgeHtml}
-        <h3>${plano.nome}</h3>
+          <h3>${plano.nome}</h3>
         <p class="pricing-price">${priceHtml}</p>
         <p class="pricing-meta">${plano.destaque}</p>
-        <ul class="pricing-features">${plano.features.map((f) => `<li>${f}</li>`).join('')}</ul>
+          <ul class="pricing-features">${plano.features.map((f) => `<li>${f}</li>`).join('')}</ul>
         <button type="button" class="btn ${plano.featured || plano.id === 'trial' ? 'btn-primary' : 'btn-ghost'}" data-open-partner-modal>
           ${plano.cta}
         </button>
-      </article>
-    `;
-  }).join('');
-};
+        </article>
+      `;
+    }).join('');
+  };
 
 initPricing();
 
