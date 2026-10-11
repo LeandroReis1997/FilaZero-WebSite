@@ -87,10 +87,10 @@ const PRICING_PLANOS = [
     id: 'trial',
     nome: 'Teste grátis',
     precoLabel: 'Grátis',
-    precoSufixo: '/ 30 dias',
+    precoSufixo: '/ 45 dias',
     destaque: 'Começa no primeiro login',
     features: [
-      '30 dias grátis',
+      '45 dias grátis',
       '1 profissional (mesmo limite do Solo)',
       'Sem cartão no cadastro',
       'Senha definida por e-mail após o cadastro',
@@ -100,7 +100,7 @@ const PRICING_PLANOS = [
   {
     id: 'solo',
     nome: 'Solo',
-    precoMensal: 29.9,
+    precoMensal: 39.9,
     destaque: '1 profissional',
     features: [
       'Agendamentos ilimitados',
@@ -113,7 +113,7 @@ const PRICING_PLANOS = [
   {
     id: 'equipe',
     nome: 'Equipe',
-    precoMensal: 49.9,
+    precoMensal: 59.9,
     destaque: 'Até 5 profissionais',
     featured: true,
     badge: 'Mais popular',
@@ -128,7 +128,7 @@ const PRICING_PLANOS = [
   {
     id: 'pro',
     nome: 'Pro',
-    precoMensal: 79.9,
+    precoMensal: 89.9,
     destaque: 'Profissionais ilimitados',
     features: [
       'Agendamentos ilimitados',
