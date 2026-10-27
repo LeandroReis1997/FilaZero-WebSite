@@ -213,6 +213,10 @@ p {
   gap: clamp(1.5rem, 4vw, 3.6rem);
 }
 
+.hero-copy h1 .hero-phrase {
+  white-space: nowrap;
+}
+
 .hero-copy h1 {
   font-size: clamp(2.1rem, 4.8vw, 4.2rem);
   margin-bottom: 1rem;
