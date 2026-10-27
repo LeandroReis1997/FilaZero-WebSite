@@ -345,6 +345,7 @@
       </div>
 
       <div class="partner-modal__body">
+        <div data-partner-signup-view>
         <p class="eyebrow">Quero ser cliente</p>
         <h2 id="partner-modal-title">Ative seu teste grátis do Fila Zero</h2>
         <p class="partner-modal__lead">
@@ -436,20 +437,25 @@
             <span>Criamos sua conta, enviamos um e-mail para você definir a senha e, no primeiro acesso ao painel, o teste grátis de 45 dias começa.</span>
           </div>
 
-          <div class="partner-form__success" data-partner-success hidden>
-            <strong>Cadastro concluído</strong>
-            <p>
-              Enviamos um e-mail para você criar a senha. Abra a mensagem, defina a senha e entre no painel.
-            </p>
-            <a class="btn btn-primary" data-partner-login-link href="#">Ir para o login</a>
-          </div>
-
           <p class="partner-form__feedback" data-partner-feedback aria-live="polite"></p>
 
           <div class="partner-form__actions" data-partner-actions>
             <button type="submit" class="btn btn-primary" data-partner-submit>Criar acesso agora</button>
           </div>
         </form>
+        </div>
+
+        <div class="partner-success-modal" data-partner-success-view hidden role="status" aria-live="polite">
+          <p class="eyebrow">Tudo certo</p>
+          <h2 id="partner-success-title">Bem-vindo ao Fila Zero</h2>
+          <p class="partner-modal__lead">
+            Seu cadastro foi concluído. Em poucos instantes você receberá um e-mail de boas-vindas com as instruções para acessar o painel.
+          </p>
+          <p class="partner-success-modal__note">
+            Confira a caixa de entrada e também a pasta de spam ou lixo eletrônico. Abra o e-mail, defina sua senha e entre no painel.
+          </p>
+          <a class="btn btn-primary" data-partner-login-link href="#">Ir para o login</a>
+        </div>
       </div>
     </section>
   </div>
@@ -474,6 +480,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20260725-1"></script>
+  <script src="script.js?v=20261027-welcome-modal"></script>
 </body>
 </html>

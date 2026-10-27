@@ -234,7 +234,8 @@ const partnerTipoCombo = document.querySelector('[data-partner-tipo-combo]');
 const partnerTipoTrigger = document.querySelector('[data-partner-tipo-trigger]');
 const partnerTipoLabel = document.querySelector('[data-partner-tipo-label]');
 const partnerTipoDropdown = document.querySelector('[data-partner-tipo-dropdown]');
-const partnerSuccess = document.querySelector('[data-partner-success]');
+const partnerSignupView = document.querySelector('[data-partner-signup-view]');
+const partnerSuccessView = document.querySelector('[data-partner-success-view]');
 const partnerActions = document.querySelector('[data-partner-actions]');
 const partnerLoginLink = document.querySelector('[data-partner-login-link]');
 const partnerTelefoneInput = document.querySelector('[data-partner-telefone]');
@@ -252,7 +253,7 @@ const partnerFormFields = partnerForm
       partnerForm.querySelectorAll(
         'input:not([type="hidden"]), select, [data-partner-tipo-combo], [data-partner-estado-combo]'
       )
-    ).filter((el) => !el.closest('[data-partner-success]'))
+    )
   : [];
 
 const PARTNER_ESTADOS = [
@@ -496,7 +497,8 @@ const setPartnerLoading = (loading) => {
 const partnerFieldWrap = (el) => el?.closest('label, .partner-form__field') || null;
 
 const resetPartnerFormView = () => {
-  if (partnerSuccess) partnerSuccess.hidden = true;
+  if (partnerSignupView) partnerSignupView.hidden = false;
+  if (partnerSuccessView) partnerSuccessView.hidden = true;
   if (partnerActions) partnerActions.hidden = false;
   partnerFormFields.forEach((field) => {
     if (field.matches('[data-partner-tipo-combo]')) {
@@ -508,15 +510,7 @@ const resetPartnerFormView = () => {
       return;
     }
     field.disabled = false;
-    const wrap = partnerFieldWrap(field);
-    if (wrap) wrap.hidden = false;
   });
-  const tipoWrap = partnerFieldWrap(partnerTipoCombo);
-  if (tipoWrap) tipoWrap.hidden = false;
-  const estadoWrap = partnerFieldWrap(partnerEstadoCombo);
-  if (estadoWrap) estadoWrap.hidden = false;
-  const info = partnerForm?.querySelector('.partner-form__info');
-  if (info) info.hidden = false;
   setPartnerFeedback('');
   setPartnerTipoValue('', '');
   setPartnerEstadoValue('', '');
@@ -525,24 +519,15 @@ const resetPartnerFormView = () => {
 };
 
 const showPartnerSuccess = (loginUrl) => {
-  partnerFormFields.forEach((field) => {
-    const wrap = partnerFieldWrap(field);
-    if (wrap) wrap.hidden = true;
-  });
-  const tipoWrap = partnerFieldWrap(partnerTipoCombo);
-  if (tipoWrap) tipoWrap.hidden = true;
-  const estadoWrap = partnerFieldWrap(partnerEstadoCombo);
-  if (estadoWrap) estadoWrap.hidden = true;
-  const info = partnerForm?.querySelector('.partner-form__info');
-  if (info) info.hidden = true;
-  if (partnerActions) partnerActions.hidden = true;
-  if (partnerSuccess) partnerSuccess.hidden = false;
+  if (partnerSignupView) partnerSignupView.hidden = true;
+  if (partnerSuccessView) partnerSuccessView.hidden = false;
   if (partnerLoginLink) {
     partnerLoginLink.href = loginUrl || `${SITE_CONFIG.adminPanelUrl}/login`;
   }
   setPartnerFeedback('');
   closePartnerTipoDropdown();
   closePartnerEstadoDropdown();
+  partnerSuccessView?.querySelector('.btn')?.focus?.();
 };
 
 const loadPartnerTipos = async () => {
